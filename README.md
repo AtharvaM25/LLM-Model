@@ -1,2 +1,2 @@
 # A domain specific (Harry-Potter series) chatbot
-This project is similar to a chatbot that gives vague answer from the dataset.
+This project works like a chatbot that gives vague or generic replies based on the data it was trained on.
