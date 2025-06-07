@@ -10,4 +10,7 @@ This project involves training a Large Language Model (LLM) on a domain-specific
 * The trained data is stored in a separate file
 * Once a prompt is given, the model predicts the next word and delivers an answer
 
-#
+# Projrct Requirements 
+* PyTorch - Used to used to build, train, and deploy neural networks efficiently, with support for GPU
+* Jupyter Notebook / Google Colab
+* Python
