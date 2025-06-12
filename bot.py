@@ -1,3 +1,4 @@
+import gradio as gr
 import os
 import kagglehub
 import torch
@@ -167,14 +168,42 @@ model = GPTLanguageModel(vocab_size)  # Added n_head here
 # generated_chars = decode(model.generate(context,max_new_tokens=500)[0].tolist())
 # print(generated_chars)
 
-with open("model-01.pkl", 'rb') as f:
+# Load saved model
+with open("model-01.pkl", "rb") as f:
     model = pickle.load(f)
-print("loaded sucessfully")
-m = model.to(device)
 
-while True:
-    prompt = input("Prompt:\n")
-    context = torch.tensor(encode(prompt), dtype=torch.long)
-    generated_chars = decode(model.generate(
-        context.unsqueeze(0), max_new_tokens=150)[0].tolist())
-    print(f'Completion:\n{generated_chars}')
+model.to(device)
+model.eval()
+
+# Encoding and decoding helpers
+
+
+def encode(s):
+    return [string_to_int.get(ch, 0) for ch in s]
+
+
+def decode(indices):
+    return "".join([int_to_string.get(i, "") for i in indices])
+
+# Generate function for the UI
+
+
+def chatbot_response(prompt, max_new_tokens=100):
+    context = torch.tensor([encode(prompt)], dtype=torch.long).to(device)
+    generated = model.generate(context, max_new_tokens=max_new_tokens)[0]
+    response = decode(generated.tolist())
+    return response
+
+
+# Launch Gradio interface
+gr.Interface(
+    fn=chatbot_response,
+    inputs=[
+        gr.Textbox(
+            lines=2, placeholder="Ask something from the world of Harry Potter..."),
+        gr.Slider(10, 500, value=100, label="Max New Tokens")
+    ],
+    outputs=gr.Textbox(label="Chatbot Response"),
+    title="Harry Potter's Gibberish Chatbot",
+    description="Ask questions related to the Harry Potter universe. Responses are based on a fine-tuned transformer."
+).launch(share=True)
