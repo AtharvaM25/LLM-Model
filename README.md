@@ -14,3 +14,16 @@ This project involves training a Large Language Model (LLM) on a domain-specific
 * **PyTorch** – Used to build, train, and deploy neural networks efficiently, with GPU support  
 * **Jupyter Notebook / Google Colab**  
 * **Python**
+
+# To run the program:-
+1.  **Ensure you have the necessary environment setup.** This includes Python installed on your system and the required libraries (PyTorch, KaggleHub). You can install them using pip:
+    ```bash
+    pip install torch kagglehub
+    ```
+2.  **Download the pre-trained model file.** The `bot.py` script expects a file named `model-01.pkl` to be present in the same directory as the script. This file contains the trained GPT model. You will need to obtain this file separately (e.g., from a training script or a provided download link).
+3.  **Place `bot.py` and `model-01.pkl` in the same directory.**
+4.  **Execute the script from your terminal:**
+    ```bash
+    python bot.py
+    ```
+5.  **Enter your prompt.** Once the script starts, it will prompt you with "Prompt:\n". Type your desired text and press Enter. The model will then generate a completion based on your input.
