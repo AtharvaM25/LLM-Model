@@ -17,7 +17,6 @@ n_head = 4
 n_layer = 4
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-# opening the data set
 
 # Download latest version
 path = kagglehub.dataset_download("moxxis/harry-potter-lstm")
@@ -83,7 +82,7 @@ class MultiHeadAttention(nn.Module):
 
 class FeedForward(nn.Module):
     def __init__(self, n_embd):
-        super().__init__()  # Moved super().__init__() here
+        super().__init__()  
         self.net = nn.Sequential(
             nn.Linear(n_embd, 4*n_embd),
             nn.ReLU(),
@@ -118,7 +117,7 @@ class GPTLanguageModel(nn.Module):
         super().__init__()
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
         self.position_embedding_table = nn.Embedding(
-            block_size, n_embd)  # Corrected typo here
+            block_size, n_embd)  
         self.blocks = nn.Sequential(
             *[Block(n_embd, n_head=n_head) for _ in range(n_layer)])
         self.ln_f = nn.LayerNorm(n_embd)
@@ -126,7 +125,7 @@ class GPTLanguageModel(nn.Module):
         self.apply(self._init_weights)
 
     def _init_weights(self, module):
-        if isinstance(module, nn.Linear):  # Corrected nn.linear to nn.Linear
+        if isinstance(module, nn.Linear):  
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
             if module.bias is not None:
                 torch.nn.init.zeros_(module.bias)
@@ -134,7 +133,7 @@ class GPTLanguageModel(nn.Module):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
     def forward(self, index, targets=None):
-        B, T = index.shape  # Define T here
+        B, T = index.shape  
         # logits=self.token_embedding_table(index)
         tok_emb = self.token_embedding_table(index)
         pos_emb = self.position_embedding_table(torch.arange(T, device=device))
@@ -158,44 +157,36 @@ class GPTLanguageModel(nn.Module):
             logits = logits[:, -1, :]
             probs = F.softmax(logits, dim=-1)
             index_next = torch.multinomial(
-                probs, num_samples=1)  # Changed num_samples to 1
+                probs, num_samples=1) 
             index = torch.cat((index, index_next), dim=-1)
         return index
 
 
-model = GPTLanguageModel(vocab_size)  # Added n_head here
+model = GPTLanguageModel(vocab_size) 
 # context=torch.zeros((1,1), dtype=torch.long)
 # generated_chars = decode(model.generate(context,max_new_tokens=500)[0].tolist())
 # print(generated_chars)
 
-# Load saved model
+
 with open("model-01.pkl", "rb") as f:
     model = pickle.load(f)
 
 model.to(device)
 model.eval()
 
-# Encoding and decoding helpers
-
-
 def encode(s):
     return [string_to_int.get(ch, 0) for ch in s]
-
 
 def decode(indices):
     return "".join([int_to_string.get(i, "") for i in indices])
 
 # Generate function for the UI
-
-
 def chatbot_response(prompt, max_new_tokens=100):
     context = torch.tensor([encode(prompt)], dtype=torch.long).to(device)
     generated = model.generate(context, max_new_tokens=max_new_tokens)[0]
     response = decode(generated.tolist())
     return response
 
-
-# Launch Gradio interface
 gr.Interface(
     fn=chatbot_response,
     inputs=[
